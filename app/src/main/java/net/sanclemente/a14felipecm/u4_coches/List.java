@@ -32,7 +32,7 @@ public class List extends Activity {
         comprobarEstadoSD();
 
         Intent intent = getIntent();
-        Toast.makeText(List.this, intent.getExtras().getString("RUTA"), Toast.LENGTH_SHORT).show();
+        //Toast.makeText(List.this, intent.getExtras().getString("RUTA"), Toast.LENGTH_SHORT).show();
 
         //Fonte de datos
         arrayMarcas = leerFichero(intent.getExtras().getString("RUTA"));
@@ -49,8 +49,7 @@ public class List extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // TODO Auto-generated method stub
-                //Toast.makeText(getBaseContext(), "Seleccionaches: " + parent.getItemAtPosition(position), Toast.LENGTH_SHORT).show();
-                Toast.makeText(getBaseContext(), "Seleccionaches: " + ((TextView) view).getText()+ parent.getItemAtPosition(position), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getBaseContext(), "Seleccionaches: " + ((TextView) view).getText()+ "| posición: "+position, Toast.LENGTH_SHORT).show();
 
             }
         });

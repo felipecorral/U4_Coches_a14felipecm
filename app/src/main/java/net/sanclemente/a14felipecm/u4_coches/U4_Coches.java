@@ -1,9 +1,11 @@
 package net.sanclemente.a14felipecm.u4_coches;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.Menu;
@@ -11,21 +13,20 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Toast;
-
-import java.io.BufferedReader;
+import android.content.DialogInterface;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.Calendar;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
-public class U4_Coches extends AppCompatActivity {
+public class U4_Coches extends Activity {
     boolean sdDisponhible = false;
     boolean sdAccesoEscritura = false;
     File dirFicheiroSD;
     File rutaCompleta;
     public static String nomeFicheiro = "ficheiro_coches.txt";
+    AlertDialog.Builder dialogo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,8 +34,6 @@ public class U4_Coches extends AppCompatActivity {
         setContentView(R.layout.activity_u4__coches);
         comprobarEstadoSD();
         establecerDirectorioFicheiro();
-
-
     }//Fin Oncreate
 
     //Metodo para comprobar estado
@@ -61,18 +60,21 @@ public class U4_Coches extends AppCompatActivity {
         RadioButton rbAdd = (RadioButton) findViewById(R.id.radiob_add);
         RadioButton rbOve = (RadioButton) findViewById(R.id.radoib_over);
         EditText editMarca = (EditText) findViewById(R.id.edit_marca);
-        Calendar cal = Calendar.getInstance();
+        //Cojo la fecha y la hora con el formato elegido
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy_HH:mm:ss");
+        String currentDateandTime = sdf.format(new Date());
+
 
         if (!editMarca.getText().toString().equals("")){
             if(sdAccesoEscritura) {
                 if (rbAdd.isChecked()) {
                     try {
                         OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(rutaCompleta, true));
-                        osw.write(editMarca.getText() + "," + cal.get(Calendar.DATE) + "\n");
+                        osw.write(editMarca.getText() + " - " + currentDateandTime + "\n");
                         osw.close();
-                        editMarca.setText("");
                         Log.i("ESCRITURA", rutaCompleta.toString());
-                        Log.i("ESCRITURA", editMarca.getText().toString());
+                        Log.i("ESCRITURA", editMarca.getText().toString()+ " - " + currentDateandTime);
+                        editMarca.setText("");
                     } catch (Exception ex) {
                         Log.e("E/S", "Error al sobreescribir el fichero");
                         ex.printStackTrace();
@@ -81,11 +83,11 @@ public class U4_Coches extends AppCompatActivity {
                 if (rbOve.isChecked()) {
                     try {
                         OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(rutaCompleta, false));
-                        osw.write(editMarca.getText() + "," + cal.get(Calendar.DATE) + "\n");
+                        osw.write(editMarca.getText() + " - " + currentDateandTime + "\n");
                         osw.close();
-                        editMarca.setText("");
                         Log.i("ESCRITURA", rutaCompleta.toString());
-                        Log.i("ESCRITURA", editMarca.getText().toString());
+                        Log.i("ESCRITURA", editMarca.getText().toString()+ " - " + currentDateandTime);
+                        editMarca.setText("");
                     } catch (Exception ex) {
                         Log.e("E/S", "Error al escribir el fichero");
                         ex.printStackTrace();
@@ -99,27 +101,9 @@ public class U4_Coches extends AppCompatActivity {
             Toast.makeText(U4_Coches.this, "No puedes añadir una marca vacia", Toast.LENGTH_SHORT).show();
             Log.e("E/S", "Se introdujo String vacio");
         }
-    }
+    }//Fin add/over
 
-    public void mostrarFichero(View v) {
-        String documento ="";
-        String linha = "";
-        //TextView tv = (TextView) findViewById(R.id.tvAmosar);
-        //tv.setText(linha);
-        if (sdDisponhible) {
-            try {
-                BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(rutaCompleta)));
-                while ((linha = br.readLine()) != null)
-                    documento+=(linha + "\n");
-                br.close();
-                Toast.makeText(U4_Coches.this, documento, Toast.LENGTH_LONG).show();
-            } catch (Exception ex) {
-                Toast.makeText(this, "Problemas lendo o ficheiro", Toast.LENGTH_SHORT).show();
-                Log.e("SD", "Erro lendo o ficheiro. ");
-            }
-        } else
-            Toast.makeText(this, "A tarxeta SD non está dispoñible", Toast.LENGTH_SHORT).show();
-    }
+
 
     public void lanzarList (View v){
         Intent inten = new Intent(this,List.class);
@@ -127,6 +111,40 @@ public class U4_Coches extends AppCompatActivity {
         startActivity(inten);
     }
 
+    public void lanzarDialog(View v){
+        showDialog(1);
+    }
+
+    /*
+    *Metodo que crea y muestra los dialogs segun el valor que recibe como parametro
+    * en este caso solo recibimos una unica llamada, asi que no comprobamos con un case el valor
+    * y solo crearemos un dialog
+     */
+    @Override
+    protected Dialog onCreateDialog(int id){
+        dialogo = new AlertDialog.Builder(this);
+        dialogo.setTitle("Mostrar Datos");
+        dialogo.setMessage("Elige como quieres visualizar los datos");
+        dialogo.setIcon(android.R.mipmap.sym_def_app_icon);
+        dialogo.setCancelable(false);
+        dialogo.setPositiveButton("ListView", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent intent = new Intent(U4_Coches.this , List.class);
+                intent.putExtra("RUTA",rutaCompleta.toString());
+                startActivity(intent);
+            }
+        });
+        dialogo.setNegativeButton("Spinner", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent intent = new Intent(U4_Coches.this , Spin.class);
+                intent.putExtra("RUTA",rutaCompleta.toString());
+                startActivity(intent);
+            }
+        });
+        return dialogo.create();
+    }//FIN onCreateDialog
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

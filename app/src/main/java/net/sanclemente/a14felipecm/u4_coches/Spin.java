@@ -31,7 +31,7 @@ public class Spin extends Activity {
         comprobarEstadoSD();
 
         Intent intent = getIntent();
-        Toast.makeText(Spin.this, intent.getExtras().getString("RUTA"), Toast.LENGTH_SHORT).show();
+        //Toast.makeText(Spin.this, intent.getExtras().getString("RUTA"), Toast.LENGTH_SHORT).show();
 
         //Fonte de datos
         arrayMarcas = leerFichero(intent.getExtras().getString("RUTA"));
@@ -46,17 +46,13 @@ public class Spin extends Activity {
         spMarcas.setOnItemSelectedListener(new OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-                //Toast.makeText(getBaseContext(), "Seleccionaches: " + parent.getItemAtPosition(pos), Toast.LENGTH_LONG).show();
-                Toast.makeText(getBaseContext(), "Seleccionaches: " + ((TextView) view).getText()+ parent.getItemAtPosition(pos), Toast.LENGTH_LONG).show();
-
+                Toast.makeText(getBaseContext(), "Seleccionaches: " + ((TextView) view).getText()+ "| posición: " + pos, Toast.LENGTH_LONG).show();
             }
-
             @Override
             public void onNothingSelected(AdapterView<?> arg0) {
                 // TODO Auto-generated method stub
             }
         }); // Fin da clase anónima
-
     }
 
 
